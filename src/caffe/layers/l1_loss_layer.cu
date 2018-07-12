@@ -11,6 +11,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void L1LossLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   int count = bottom[0]->count();
   caffe_gpu_sub<Ftype>(
       count,
@@ -28,6 +29,7 @@ void L1LossLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void L1LossLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   for (int i = 0; i < 2; ++i) {
     if (propagate_down[i]) {
       const Btype sign = (i == 0) ? 1 : -1;

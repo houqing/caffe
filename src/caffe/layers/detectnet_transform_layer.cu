@@ -348,6 +348,7 @@ template <typename Dtype>
 void DetectNetTransformationLayer<Dtype>::Forward_gpu(
     const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Dtype* bottom_data = bottom[0]->gpu_data<Dtype>();
   Dtype* top_data = top[0]->mutable_gpu_data<Dtype>();
   AugmentSelection* aug_data = reinterpret_cast<AugmentSelection*>(

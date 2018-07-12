@@ -33,6 +33,7 @@ __global__ void MaxForward(const int nthreads, const Ftype* bottom_data_a,
 template <typename Ftype, typename Btype>
 void EltwiseLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   int* mask = nullptr;
   const int count = top[0]->count();
   //  convert to Ftype
@@ -70,10 +71,14 @@ void EltwiseLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       // NOLINT_NEXT_LINE(whitespace/operators)
       MaxForward <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
           count, bottom[0]->gpu_data<Ftype>(), bottom[1]->gpu_data<Ftype>(), 0, top_data, mask);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-MaxForward", "n=" << count, "");
       for (int i = 2; i < bottom.size(); ++i) {
         // NOLINT_NEXT_LINE(whitespace/operators)
         MaxForward <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
             count, top_data, bottom[i]->gpu_data<Ftype>(), i - 1, top_data, mask);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-MaxForward", "n=" << count, "");
       }
       CUDA_CHECK(cudaStreamSynchronize(stream));
     }
@@ -98,6 +103,7 @@ __global__ void MaxBackward(const int nthreads, const Btype* top_diff,
 template <typename Ftype, typename Btype>
 void EltwiseLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const int* mask = nullptr;
   const int count = top[0]->count();
   const Btype* top_data = top[0]->gpu_data<Btype>();
@@ -140,6 +146,8 @@ void EltwiseLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
         MaxBackward<Btype>  // NOLINT_NEXT_LINE(whitespace/operators)
             <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
             count, top_diff, i, mask, bottom[i]->mutable_gpu_diff<Btype>());
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-MaxBackward", "n=" << count, "");
         CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
         break;
       default:

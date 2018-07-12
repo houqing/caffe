@@ -19,6 +19,7 @@ void PowerLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void PowerLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   const int count = bottom[0]->count();
   // Special case where we can ignore the input: scale or power is 0.
@@ -44,6 +45,7 @@ template <typename Ftype, typename Btype>
 void PowerLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     Btype* bottom_diff = bottom[0]->mutable_cpu_diff<Btype>();
     const int count = bottom[0]->count();

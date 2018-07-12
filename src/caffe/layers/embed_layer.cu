@@ -41,6 +41,7 @@ __global__ void EmbedBackward(const int nthreads, const Dtype* bottom_data,
 template <typename Ftype, typename Btype>
 void EmbedLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const Ftype* weight = this->blobs_[0]->template gpu_data<Ftype>();
@@ -59,6 +60,7 @@ void EmbedLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void EmbedLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   CHECK(!propagate_down[0]) << "Can't backpropagate to EmbedLayer input.";
   if (this->param_propagate_down_[0]) {
     const int top_count = top[0]->count();

@@ -10,26 +10,12 @@ namespace caffe {
 SHMEM(asum);
 CAFFE_GPU_SHMEM(asum);
 
-#define BLOCK_REDUCE_ASUM(TNUM) \
-if (BlockSize >= (TNUM) * 2) { \
-  if (tid < (TNUM)) { \
-    tsum_replace(st, sdata[tid + (TNUM)]); \
-  } \
-  __syncthreads(); \
-}
+#define BLOCK_REDUCE_ASUM(TNUM) if (BlockSize >= (TNUM) * 2) {   if (tid < (TNUM)) {     tsum_replace(st, sdata[tid + (TNUM)]);   }   __syncthreads(); }
 
 #if CUDA_VERSION >= 9000
-#define REDUCE_ASUM(TNUM) \
-if (tid + (TNUM) < thread_count) { \
-  tsum_replace(st, sdata[tid + (TNUM)]); \
-  __syncwarp(); \
-}
+#define REDUCE_ASUM(TNUM) if (tid + (TNUM) < thread_count) {   tsum_replace(st, sdata[tid + (TNUM)]);   __syncwarp(); }
 #else
-#define REDUCE_ASUM(TNUM) \
-if (tid + (TNUM) < thread_count) { \
-  tsum_replace(st, sdata[tid + (TNUM)]); \
-  __syncthreads(); \
-}
+#define REDUCE_ASUM(TNUM) if (tid + (TNUM) < thread_count) {   tsum_replace(st, sdata[tid + (TNUM)]);   __syncthreads(); }
 #endif
 
 ///////////////////////////////////// ASUM REDUCTION ///////////////////////////////////
@@ -156,6 +142,8 @@ void gpu_asum_t(const int n, const T* x, TR* sum, int group) {
         threadsPerCta * sizeof(TR) + sizeof(bool), stream>>>
             ((unsigned int)n, x, dev_ptr_sum, group);
   }
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << n, "abs16=" << n << " a16=" << n);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaMemcpyAsync(sum, dev_ptr_sum, sizeof(TR), cudaMemcpyDeviceToHost, stream));
   CUDA_CHECK(cudaStreamSynchronize(stream));

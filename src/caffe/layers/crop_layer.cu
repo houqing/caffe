@@ -93,6 +93,7 @@ void CropLayer<Ftype, Btype>::crop_copy_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CropLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   std::vector<int> indices(top[0]->num_axes(), 0);
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
@@ -102,6 +103,7 @@ void CropLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CropLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();
 

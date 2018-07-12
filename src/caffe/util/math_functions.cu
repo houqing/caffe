@@ -21,6 +21,7 @@ void caffe_gpu_gemm<float>(const CBLAS_TRANSPOSE TransA,
       (TransA == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
   cublasOperation_t cuTransB =
       (TransB == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
+MY_DP("CUBLAS-cublasSgemm");
   CUBLAS_CHECK(cublasSgemm(Caffe::cublas_handle(0), cuTransB, cuTransA,
       N, M, K, &alpha, B, ldb, A, lda, &beta, C, N));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(0)));
@@ -38,6 +39,7 @@ void caffe_gpu_gemm<double>(const CBLAS_TRANSPOSE TransA,
       (TransA == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
   cublasOperation_t cuTransB =
       (TransB == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
+MY_DP("CUBLAS-cublasDgemm");
   CUBLAS_CHECK(cublasDgemm(Caffe::cublas_handle(0), cuTransB, cuTransA,
       N, M, K, &alpha, B, ldb, A, lda, &beta, C, N));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(0)));
@@ -64,12 +66,16 @@ void caffe_gpu_gemm<float16>(const CBLAS_TRANSPOSE TransA,
     CUBLAS_CHECK(cublasSetMathMode(handle, CUBLAS_TENSOR_OP_MATH));
     const float alpha_fp32 = static_cast<float>(alpha);
     const float beta_fp32 = static_cast<float>(beta);
+//MY_DP("CUBLAS-cublasGemmEx");
+MY_DPI("CUBLAS-cublasGemmEx", "m=" << N << " n=" << M << " k=" << K << " transa=" << cuTransA << " transb=" << cuTransB << " lda=" << ldb << " ldb=" << lda << " ldc=" << N << " Atype=R_16F Btype=R_16F Ctype=R_16F computeType=R_32F algo=CUBLAS_GEMM_DFALT_TENSOR_OP", "macc32=" << N * M * K);
+//MY_DP("CUBLAS-cublasGemmEx[" << "cuTransB=" << cuTransB << " cuTransA=" << cuTransA << " N=" << N << " M=" << M << " K=" << K << "]");
     CUBLAS_CHECK(cublasGemmEx(handle, cuTransB, cuTransA,
         N, M, K, &alpha_fp32, B->gethp<half>(), CUDA_R_16F, ldb,
         A->gethp<half>(), CUDA_R_16F, lda, &beta_fp32, C->gethp<half>(),
         CUDA_R_16F, N, CUDA_R_32F, CUBLAS_GEMM_DFALT_TENSOR_OP));
     CUBLAS_CHECK(cublasSetMathMode(handle, math_mode));
 #else
+MY_DP("CUBLAS-cublasHgemm");
     CUBLAS_CHECK(cublasHgemm(handle, cuTransB, cuTransA,
     N, M, K, alpha.gethp<half>(), B->gethp<half>(), ldb,
     A->gethp<half>(), lda, beta.gethp<half>(), C->gethp<half>(), N));
@@ -77,6 +83,7 @@ void caffe_gpu_gemm<float16>(const CBLAS_TRANSPOSE TransA,
   } else {
     float alpha_fp32 = static_cast<float>(alpha);
     float beta_fp32 = static_cast<float>(beta);
+MY_DP("CUBLAS-cublasSgemmEx");
     CUBLAS_CHECK(cublasSgemmEx(handle, cuTransB, cuTransA,
         N, M, K, &alpha_fp32, B->gethp<half>(), CAFFE_DATA_HALF, ldb,
         A->gethp<half>(), CAFFE_DATA_HALF, lda, &beta_fp32, C->gethp<half>(),
@@ -91,6 +98,7 @@ void caffe_gpu_gemv<float>(const CBLAS_TRANSPOSE TransA, const int M,
     const float beta, float* y) {
   cublasOperation_t cuTransA =
       (TransA == CblasNoTrans) ? CUBLAS_OP_T : CUBLAS_OP_N;
+MY_DP("CUBLAS-cublasSgemv");
   CUBLAS_CHECK(cublasSgemv(Caffe::cublas_handle(0), cuTransA, N, M, &alpha,
       A, N, x, 1, &beta, y, 1));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(0)));
@@ -102,6 +110,7 @@ void caffe_gpu_gemv<double>(const CBLAS_TRANSPOSE TransA, const int M,
     const double beta, double* y) {
   cublasOperation_t cuTransA =
       (TransA == CblasNoTrans) ? CUBLAS_OP_T : CUBLAS_OP_N;
+MY_DP("CUBLAS-cublasDgemv");
   CUBLAS_CHECK(cublasDgemv(Caffe::cublas_handle(0), cuTransA, N, M, &alpha,
       A, N, x, 1, &beta, y, 1));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(0)));
@@ -125,12 +134,16 @@ void caffe_gpu_gemv<float16>(const CBLAS_TRANSPOSE TransA, const int M,
     CUBLAS_CHECK(cublasSetMathMode(handle, CUBLAS_TENSOR_OP_MATH));
     const float alpha_fp32 = static_cast<float>(alpha);
     const float beta_fp32 = static_cast<float>(beta);
+//MY_DP("CUBLAS-cublasGemmEx");
+//MY_DP("CUBLAS-cublasGemmEx[" << "m(Ar,Cr)=" << m << " n(xc,yc)=" << 1 << " k(Ac,xr)=" << k << "]");
+MY_DPI("CUBLAS-cublasGemmEx", "m=" << m << " n=" << 1 << " k=" << k << " transa=" << cuTransA << " transb=" << CUBLAS_OP_N << " lda=" << LDA << " ldb=" << k << " ldc=" << LDC << " Atype=R_16F Btype=R_16F Ctype=R_16F computeType=R_32F algo=CUBLAS_GEMM_DFALT_TENSOR_OP", "macc32=" << m * 1 * k);
     CUBLAS_CHECK(cublasGemmEx(handle, cuTransA, CUBLAS_OP_N,
         m, 1, k, &alpha_fp32, A->gethp<half>(), CUDA_R_16F, LDA,
         x->gethp<half>(), CUDA_R_16F, k, &beta_fp32, y->gethp<half>(),
         CUDA_R_16F, LDC, CUDA_R_32F, CUBLAS_GEMM_DFALT_TENSOR_OP));
     CUBLAS_CHECK(cublasSetMathMode(handle, math_mode));
 #else
+MY_DP("CUBLAS-cublasHgemm");
     CUBLAS_CHECK(cublasHgemm(handle, cuTransA, CUBLAS_OP_N,
         m, 1, k, alpha.gethp<half>(), A->gethp<half>(), LDA,
         x->gethp<half>(), k, beta.gethp<half>(),
@@ -139,6 +152,7 @@ void caffe_gpu_gemv<float16>(const CBLAS_TRANSPOSE TransA, const int M,
   } else {
     float alpha_fp32 = static_cast<float>(alpha);
     float beta_fp32 = static_cast<float>(beta);
+MY_DP("CUBLAS-cublasSgemmEx");
     CUBLAS_CHECK(cublasSgemmEx(Caffe::cublas_handle(0), cuTransA, CUBLAS_OP_N,
         m, 1, k, &alpha_fp32, A, CAFFE_DATA_HALF, LDA,
         x, CAFFE_DATA_HALF, k, &beta_fp32,
@@ -154,6 +168,7 @@ void caffe_gpu_axpy<float>(const int N, const float alpha, const float* X,
       handle == nullptr ? Caffe::cublas_handle(0) : reinterpret_cast<cublasHandle_t>(handle);
   cudaStream_t stream;
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream));
+MY_DP("CUBLAS-cublasSaxpy");
   CUBLAS_CHECK(cublasSaxpy(cublas_handle, N, &alpha, X, 1, Y, 1));
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -165,6 +180,7 @@ void caffe_gpu_axpy<double>(const int N, const double alpha, const double* X,
       handle == nullptr ? Caffe::cublas_handle(0) : reinterpret_cast<cublasHandle_t>(handle);
   cudaStream_t stream;
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream));
+MY_DP("CUBLAS-cublasDaxpy");
   CUBLAS_CHECK(cublasDaxpy(cublas_handle, N, &alpha, X, 1, Y, 1));
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -204,6 +220,7 @@ void caffe_gpu_axpy<float16>(const int N, const float16 alpha, const float16* x,
   // NOLINT_NEXT_LINE(whitespace/operators)
   axpy_kernel<<<CAFFE_GET_BLOCKS_HALF(N), CAFFE_CUDA_NUM_THREADS_HALF, 0, stream>>>
       (N, ha, reinterpret_cast<const half*>(x), reinterpret_cast<half*>(y));
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -228,6 +245,7 @@ void caffe_gpu_scal<float>(const int N, const float alpha, float* X, cublasHandl
   if (alpha == 1.F) { return; }
   cudaStream_t stream;
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream));
+MY_DP("CUBLAS-cublasSscal");
   CUBLAS_CHECK(cublasSscal(cublas_handle, N, &alpha, X, 1));
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -238,6 +256,7 @@ void caffe_gpu_scal<double>(const int N, const double alpha, double* X,
   if (alpha == 1.0) { return; }
   cudaStream_t stream;
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream));
+MY_DP("CUBLAS-cublasDscal");
   CUBLAS_CHECK(cublasDscal(cublas_handle, N, &alpha, X, 1));
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -254,6 +273,8 @@ void caffe_gpu_scal<float16>(const int n, const float16 alpha, float16* x,
   // NOLINT_NEXT_LINE(whitespace/operators)
   scale_in_place_kernel <<<CAFFE_GET_BLOCKS_HALF(n), CAFFE_CUDA_NUM_THREADS_HALF, 0, stream>>>
       (n, ha, reinterpret_cast<half*>(x));
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << n, "m16=" << n);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -301,18 +322,22 @@ void caffe_gpu_axpby<float16>(const int N, const float16 alpha,
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   axpby_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, alpha, X, beta, Y);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "a16=" << N << " m16=" << 2 * N);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
 
 template<>
 void caffe_gpu_dot<float, float>(const int n, const float* x, const float* y, float* out) {
+MY_DP("CUBLAS-cublasSdot");
   CUBLAS_CHECK(cublasSdot(Caffe::cublas_handle(0), n, x, 1, y, 1, out));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
 }
 
 template<>
 void caffe_gpu_dot<double, double>(const int n, const double* x, const double* y, double* out) {
+MY_DP("CUBLAS-cublasDdot");
   CUBLAS_CHECK(cublasDdot(Caffe::cublas_handle(0), n, x, 1, y, 1, out));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
 }
@@ -320,6 +345,7 @@ void caffe_gpu_dot<double, double>(const int n, const double* x, const double* y
 template<>
 void caffe_gpu_dot<double, float>(const int n, const double* x, const double* y, float* outf) {
   double out = 0.;
+MY_DP("CUBLAS-cublasDdot");
   CUBLAS_CHECK(cublasDdot(Caffe::cublas_handle(0), n, x, 1, y, 1, &out));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
   *outf = static_cast<float>(out);
@@ -352,6 +378,7 @@ caffe_gpu_dot<float16, float16>(const int n, const float16* x, const float16* y,
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   gpu_dot_kernel<<<1, CAFFE_CUDA_NUM_THREADS, 0, stream>>>(n, x, y, res);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaMemcpyAsync(&fres, res, ws.size(), cudaMemcpyDeviceToHost, stream));
   CUDA_CHECK(cudaStreamSynchronize(stream));
@@ -365,6 +392,8 @@ void caffe_gpu_dot<float16, float>(const int n, const float16* x, const float16*
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   gpu_dot_kernel<<<1, CAFFE_CUDA_NUM_THREADS, 0, stream>>>(n, x, y, res);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << n, "a32=" << n << " m16=" << n);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaMemcpyAsync(out, res, ws.size(), cudaMemcpyDeviceToHost, stream));
   CUDA_CHECK(cudaStreamSynchronize(stream));
@@ -372,6 +401,7 @@ void caffe_gpu_dot<float16, float>(const int n, const float16* x, const float16*
 
 template<>
 void caffe_gpu_asum<float, float>(const int n, const float* x, float* y, int group) {
+MY_DP("CUBLAS-cublasSasum");
   CUBLAS_CHECK(cublasSasum(Caffe::cublas_handle(group), n, x, 1, y));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(group)));
 }
@@ -379,18 +409,21 @@ void caffe_gpu_asum<float, float>(const int n, const float* x, float* y, int gro
 template<>
 void caffe_gpu_asum<float, double>(const int n, const float* x, double* y, int group) {
   float yf;
+MY_DP("CUBLAS-cublasSasum");
   CUBLAS_CHECK(cublasSasum(Caffe::cublas_handle(group), n, x, 1, &yf));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(group)));
   *y = yf;
 }
 template<>
 void caffe_gpu_asum<double, double>(const int n, const double* x, double* y, int group) {
+MY_DP("CUBLAS-cublasDasum");
   CUBLAS_CHECK(cublasDasum(Caffe::cublas_handle(group), n, x, 1, y));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(group)));
 }
 template<>
 void caffe_gpu_asum<double, float>(const int n, const double* x, float* y, int group) {
   double yd;
+MY_DP("CUBLAS-cublasDasum");
   CUBLAS_CHECK(cublasDasum(Caffe::cublas_handle(group), n, x, 1, &yd));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream(group)));
   *y = yd;
@@ -398,14 +431,18 @@ void caffe_gpu_asum<double, float>(const int n, const double* x, float* y, int g
 
 template<>
 void caffe_gpu_scale<double>(const int n, const double alpha, const double* x, double* y) {
+MY_DP("CUBLAS-cublasDcopy");
   CUBLAS_CHECK(cublasDcopy(Caffe::cublas_handle(0), n, x, 1, y, 1));
+MY_DP("CUBLAS-cublasDscal");
   CUBLAS_CHECK(cublasDscal(Caffe::cublas_handle(0), n, &alpha, y, 1));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
 }
 
 template<>
 void caffe_gpu_scale<float>(const int n, const float alpha, const float* x, float* y) {
+MY_DP("CUBLAS-cublasScopy");
   CUBLAS_CHECK(cublasScopy(Caffe::cublas_handle(0), n, x, 1, y, 1));
+MY_DP("CUBLAS-cublasSscal");
   CUBLAS_CHECK(cublasSscal(Caffe::cublas_handle(0), n, &alpha, y, 1));
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
 }
@@ -425,6 +462,7 @@ void caffe_gpu_scale<float16>(const int n, const float16 alpha, const float16* x
   // NOLINT_NEXT_LINE(whitespace/operators)
   scale_kernel <<<CAFFE_GET_BLOCKS_HALF(n), CAFFE_CUDA_NUM_THREADS_HALF, 0, stream>>>
       (n, ha, reinterpret_cast<const half*>(x), reinterpret_cast<half*>(y));
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -444,6 +482,8 @@ void caffe_gpu_set(const size_t N, const Dtype alpha, Dtype* Y) {
   } else {
     // NOLINT_NEXT_LINE(whitespace/operators)
     set_kernel <<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>> (N, alpha, Y);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "y=alpha");
     CUDA_POST_KERNEL_CHECK;
   }
   CUDA_CHECK_ARG2(cudaStreamSynchronize(stream), stream, Caffe::current_device());
@@ -470,6 +510,7 @@ void caffe_gpu_add_scalar(const int N, const float alpha, float* Y) {
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators
   add_scalar_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, alpha, Y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -479,6 +520,7 @@ void caffe_gpu_add_scalar(const int N, const double alpha, double* Y) {
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   add_scalar_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, alpha, Y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -488,6 +530,8 @@ void caffe_gpu_add_scalar(const int N, const float16 alpha, float16* Y) {
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   add_scalar_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, alpha, Y);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "a16=" << N);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -511,6 +555,7 @@ void caffe_gpu_add<float>(const int N, const float* a, const float* b, float* y)
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   add_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b, y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -520,6 +565,7 @@ void caffe_gpu_add<double>(const int N, const double* a, const double* b, double
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   add_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b, y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -531,6 +577,8 @@ void caffe_gpu_add<float16>(const int N, const float16* a, const float16* b, flo
   add_kernel<<<CAFFE_GET_BLOCKS_HALF(N), CAFFE_CUDA_NUM_THREADS_HALF, 0, stream>>>
       (N, reinterpret_cast<const half*>(a), reinterpret_cast<const half*>(b),
        reinterpret_cast<half*>(y));
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "a16=" << N);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -554,6 +602,7 @@ void caffe_gpu_incr<float>(const int N, const float* a, float* b) {
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   incr_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -563,6 +612,7 @@ void caffe_gpu_incr<double>(const int N, const double* a, double* b) {
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   incr_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -573,6 +623,8 @@ void caffe_gpu_incr<float16>(const int N, const float16* a, float16* b) {
   // NOLINT_NEXT_LINE(whitespace/operators)
   incr_kernel<<<CAFFE_GET_BLOCKS_HALF(N), CAFFE_CUDA_NUM_THREADS_HALF, 0, stream>>>
       (N, reinterpret_cast<const half*>(a), reinterpret_cast<half*>(b));
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "a16=" << N);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -590,6 +642,7 @@ void caffe_gpu_sub<float>(const int N, const float* a, const float* b, float* y)
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   sub_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b, y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -599,6 +652,7 @@ void caffe_gpu_sub<double>(const int N, const double* a, const double* b, double
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   sub_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b, y);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -608,6 +662,8 @@ void caffe_gpu_sub<float16>(const int N, const float16* a, const float16* b, flo
   cudaStream_t stream = Caffe::thread_stream();
   // NOLINT_NEXT_LINE(whitespace/operators)
   sub_kernel<<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N, a, b, y);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << N, "a16=" << N);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

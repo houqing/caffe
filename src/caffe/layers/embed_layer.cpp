@@ -63,6 +63,7 @@ void EmbedLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void EmbedLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   const Ftype* weight = this->blobs_[0]->template cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
@@ -84,6 +85,7 @@ void EmbedLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void EmbedLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   CHECK(!propagate_down[0]) << "Can't backpropagate to EmbedLayer input.";
   if (this->param_propagate_down_[0]) {
     const Btype* top_diff = top[0]->cpu_diff<Btype>();

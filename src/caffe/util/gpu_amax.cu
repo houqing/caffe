@@ -155,6 +155,7 @@ void gpu_amax_t(const int n, const T* x, TR* result, int group) {
         threadsPerCta * sizeof(TR) + sizeof(bool), stream>>>
             ((unsigned int)n, x, dev_ptr_max, group);
   }
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaMemcpyAsync(result, dev_ptr_max, sizeof(TR), cudaMemcpyDeviceToHost, stream));
   CUDA_CHECK(cudaStreamSynchronize(stream));

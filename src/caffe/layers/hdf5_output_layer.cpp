@@ -40,6 +40,7 @@ void HDF5OutputLayer<Ftype, Btype>::SaveBlobs() {
 template <typename Ftype, typename Btype>
 void HDF5OutputLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   CHECK_GE(bottom.size(), 2);
   CHECK_EQ(bottom[0]->num(), bottom[1]->num());
   data_blob_.Reshape(bottom[0]->num(), bottom[0]->channels(),
@@ -61,6 +62,7 @@ void HDF5OutputLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void HDF5OutputLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   return;
 }
 

@@ -15,6 +15,7 @@ __global__ void ThresholdForward(const int n, const float threshold,
 template <typename Ftype, typename Btype>
 void ThresholdLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -22,6 +23,7 @@ void ThresholdLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   // NOLINT_NEXT_LINE(whitespace/operators)
   ThresholdForward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
       count, threshold_, bottom_data, top_data);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

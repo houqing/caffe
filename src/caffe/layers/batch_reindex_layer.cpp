@@ -20,6 +20,7 @@ void BatchReindexLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void BatchReindexLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
                                            const vector<Blob*>& top) {
+MY_DP("");
   check_batch_reindex(bottom[0]->shape(0), bottom[1]->count(),
                       bottom[1]->cpu_data<Ftype>());
   if (top[0]->count() == 0) {
@@ -40,6 +41,7 @@ template <typename Ftype, typename Btype>
 void BatchReindexLayer<Ftype, Btype>::Backward_cpu(
     const vector<Blob*>& top, const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   CHECK(!propagate_down[1]) << "Cannot backprop to index.";
   if (!propagate_down[0]) {
     return;

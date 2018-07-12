@@ -56,6 +56,7 @@ void ConcatLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ConcatLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   if (bottom.size() == 1) { return; }
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   int offset_concat_axis = 0;
@@ -76,6 +77,7 @@ void ConcatLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ConcatLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (bottom.size() == 1) { return; }
   const Btype* top_diff = top[0]->cpu_diff<Btype>();
   int offset_concat_axis = 0;

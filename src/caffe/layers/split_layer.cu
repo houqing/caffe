@@ -7,11 +7,13 @@ namespace caffe {
 
 template<typename Ftype, typename Btype>
 void SplitLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
 }
 
 template<typename Ftype, typename Btype>
 void SplitLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) {
     return;
   }

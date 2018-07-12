@@ -21,6 +21,7 @@ __global__ void Tile(const int nthreads, const Dtype* bottom_data,
 template <typename Ftype, typename Btype>
 void TileLayer<Ftype, Btype>::Forward_gpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int bottom_tile_axis = bottom[0]->shape(axis_);
@@ -52,6 +53,7 @@ __global__ void TileBackward(const int nthreads, const Dtype* top_diff,
 template <typename Ftype, typename Btype>
 void TileLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) { return; }
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();

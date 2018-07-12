@@ -11,6 +11,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void InnerProductLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const Ftype* weight = this->blobs_[0]->template gpu_data<Ftype>();
@@ -37,6 +38,7 @@ void InnerProductLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void InnerProductLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   // dE/dW and dE/dB
   // dE/dW: Gradient with respect to weight
   if (this->param_propagate_down_[0]) {

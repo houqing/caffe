@@ -19,6 +19,7 @@ __global__ void BiasForward(const int n, const Dtype* in,
 template <typename Ftype, typename Btype>
 void BiasLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   const int count = top[0]->count();
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   const Ftype* bias_data =
@@ -33,6 +34,7 @@ void BiasLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void BiasLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0] && bottom[0] != top[0]) {
     const Btype* top_diff = top[0]->gpu_diff<Btype>();
     Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();

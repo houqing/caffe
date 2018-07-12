@@ -66,6 +66,7 @@ void PReLULayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void PReLULayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -92,6 +93,7 @@ template <typename Ftype, typename Btype>
 void PReLULayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* bottom_data = bottom[0]->cpu_data<Btype>();
   const Btype* slope_data = this->blobs_[0]->template cpu_data<Btype>();
   const Btype* top_diff = top[0]->cpu_diff<Btype>();

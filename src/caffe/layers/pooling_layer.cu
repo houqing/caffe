@@ -159,6 +159,7 @@ __global__ void StoPoolForwardTest(const int nthreads,
 template <typename Ftype, typename Btype>
 void PoolingLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   int count = top[0]->count();
   // We'll output the mask to top[1] if it's of size >1.
@@ -179,6 +180,8 @@ void PoolingLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
         height_, width_, pooled_height_, pooled_width_, kernel_h_,
         kernel_w_, stride_h_, stride_w_, pad_h_, pad_w_, top[0]->mutable_gpu_data<Ftype>(),
         mask, top_mask);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-MaxPoolForward", "n=" << count << " num=" << bottom[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_ << " ph=" << pad_h_ << " pw=" << pad_w_, "comp32=" << count * kernel_h_ * kernel_w_ << " conv16to32=" << count * kernel_h_ * kernel_w_);
     break;
   case PoolingParameter_PoolMethod_AVE:
     // NOLINT_NEXT_LINE(whitespace/operators)
@@ -186,6 +189,8 @@ void PoolingLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
         count, bottom_data, bottom[0]->num(), channels_,
         height_, width_, pooled_height_, pooled_width_, kernel_h_,
         kernel_w_, stride_h_, stride_w_, pad_h_, pad_w_, top[0]->mutable_gpu_data<Ftype>());
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-AvePoolForward", "n=" << count << " num=" << bottom[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_ << " ph=" << pad_h_ << " pw=" << pad_w_, "a16=" << count * height_ * width_ << " d16=" << count);
     break;
   case PoolingParameter_PoolMethod_STOCHASTIC:
     if (this->phase_ == TRAIN) {
@@ -199,6 +204,8 @@ void PoolingLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
           height_, width_, pooled_height_, pooled_width_, kernel_h_,
           kernel_w_, stride_h_, stride_w_,
           rand_idx_.mutable_gpu_data(), top[0]->mutable_gpu_data<Ftype>());
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-StoPoolForwardTrain", "n=" << count << " num=" << bottom[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_, "top=StoPoolForwardTrain(bottom)");
     } else {
       // NOLINT_NEXT_LINE(whitespace/operators)
       StoPoolForwardTest<Ftype><<<CAFFE_GET_BLOCKS(count),
@@ -338,6 +345,7 @@ __global__ void StoPoolBackward(const int nthreads,
 template <typename Ftype, typename Btype>
 void PoolingLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) {
     return;
   }
@@ -366,6 +374,8 @@ void PoolingLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
           height_, width_, pooled_height_, pooled_width_,
           kernel_h_, kernel_w_, stride_h_, stride_w_, pad_h_, pad_w_,
           bottom_diff);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-MaxPoolBackward", "n=" << count << " num=" << top[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_ << " ph=" << pad_h_ << " pw=" << pad_w_, "a32=" << top[0]->num() * channels_ * pooled_height_ * pooled_width_ << "comp32" << top[0]->num() * channels_ * pooled_height_ * pooled_width_ * 9 << " conv16to32=" << count);
     }
     break;
   case PoolingParameter_PoolMethod_AVE:
@@ -374,6 +384,8 @@ void PoolingLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
         count, top_diff, top[0]->num(), channels_,
         height_, width_, pooled_height_, pooled_width_, kernel_h_,
         kernel_w_, stride_h_, stride_w_, pad_h_, pad_w_, bottom_diff);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-AvePoolBackward", "n=" << count << " num=" << top[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_ << " ph=" << pad_h_ << " pw=" << pad_w_, "a32=" << count << " d32=" << count << " conv16to32=" << count);
     break;
   case PoolingParameter_PoolMethod_STOCHASTIC:
     // NOLINT_NEXT_LINE(whitespace/operators)
@@ -382,6 +394,8 @@ void PoolingLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
         top[0]->num(), channels_, height_, width_, pooled_height_,
         pooled_width_, kernel_h_, kernel_w_, stride_h_, stride_w_,
         bottom_diff);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-StoPoolBackward", "n=" << count << " num=" << top[0]->num() << " c=" << channels_ << " h=" << height_ << " w=" << width_ << " pool_h=" << pooled_height_ << " pool_w=" << pooled_width_ << " kh=" << kernel_h_ << " kw=" << kernel_w_ << " sh=" << stride_h_ << " sw=" << stride_w_ << " ph=" << pad_h_ << " pw=" << pad_w_, "bottom=StoPoolBackward(top)");
     break;
   default:
     LOG(FATAL) << "Unknown pooling method.";

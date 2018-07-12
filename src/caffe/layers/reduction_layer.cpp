@@ -41,6 +41,7 @@ void ReductionLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ReductionLayer<Ftype, Btype>::Forward_cpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   const Ftype* mult_data = NULL;
   if (sum_multiplier_.count() > 0) {
@@ -76,6 +77,7 @@ void ReductionLayer<Ftype, Btype>::Forward_cpu(
 template <typename Ftype, typename Btype>
 void ReductionLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) { return; }
   // Get bottom_data, if needed.
   const Btype* bottom_data = NULL;

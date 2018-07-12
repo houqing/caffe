@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void CuDNNReLULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
      const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   // Fallback to standard Caffe for leaky ReLU.
   if (ReLULayer<Ftype, Btype>::layer_param_.relu_param().negative_slope() != 0) {
@@ -26,6 +27,7 @@ template <typename Ftype, typename Btype>
 void CuDNNReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) {
     return;
   }

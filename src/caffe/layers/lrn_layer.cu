@@ -55,6 +55,7 @@ __global__ void LRNFillScale(const int nthreads, const Ftype* const in,
 template <typename Ftype, typename Btype>
 void LRNLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   switch (this->layer_param_.lrn_param().norm_region()) {
   case LRNParameter_NormRegion_ACROSS_CHANNELS:
     CrossChannelForward_gpu(bottom, top);
@@ -90,11 +91,13 @@ void LRNLayer<Ftype, Btype>::CrossChannelForward_gpu(
   LRNFillScale<<<CAFFE_GET_BLOCKS(n_threads), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
       n_threads, bottom_data, num_, channels_, height_, width_, size_,
       alpha_ / size_, k_, scale_data);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   n_threads = bottom[0]->count();
   // NOLINT_NEXT_LINE(whitespace/operators)
   LRNComputeOutput<Ftype><<<CAFFE_GET_BLOCKS(n_threads), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
       n_threads, bottom_data, scale_data, -beta_, top[0]->mutable_gpu_data<Ftype>());
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -102,6 +105,7 @@ void LRNLayer<Ftype, Btype>::CrossChannelForward_gpu(
 template <typename Ftype, typename Btype>
 void LRNLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   switch (this->layer_param_.lrn_param().norm_region()) {
   case LRNParameter_NormRegion_ACROSS_CHANNELS:
     CrossChannelBackward_gpu(top, propagate_down, bottom);
@@ -185,6 +189,7 @@ void LRNLayer<Ftype, Btype>::CrossChannelBackward_gpu(
       num_, channels_, height_, width_,
       size_, -beta_, 2. * alpha_ * beta_ / size_,
       bottom[0]->mutable_gpu_diff<Btype>());
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

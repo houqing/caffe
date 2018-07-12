@@ -11,6 +11,8 @@
 #endif
 #include <sched.h>
 
+#include "stacktrace.h"
+
 //
 // CUDA macros
 //

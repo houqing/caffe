@@ -29,6 +29,7 @@ __global__ void ScaleBiasForward(const int n, const Dtype* in,
 template <typename Ftype, typename Btype>
 void ScaleLayer<Ftype, Btype>::Forward_gpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   if (bottom[0] == top[0]) {
     // in-place computation; need to store bottom data before overwriting it.
     // Note that this is only necessary for Backward; we could skip this if not
@@ -58,6 +59,7 @@ void ScaleLayer<Ftype, Btype>::Forward_gpu(
 template <typename Ftype, typename Btype>
 void ScaleLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (bias_layer_ &&
       this->param_propagate_down_[this->param_propagate_down_.size() - 1]) {
     bias_layer_->Backward(top, bias_propagate_down_, bias_bottom_vec_);

@@ -115,6 +115,7 @@ void CropLayer<Ftype, Btype>::crop_copy(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CropLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   std::vector<int> indices(top[0]->num_axes(), 0);
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
@@ -124,6 +125,7 @@ void CropLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CropLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* top_diff = top[0]->cpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_cpu_diff<Btype>();
 

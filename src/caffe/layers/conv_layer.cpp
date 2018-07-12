@@ -24,6 +24,7 @@ void ConvolutionLayer<Ftype, Btype>::compute_output_shape() {
 template <typename Ftype, typename Btype>
 void ConvolutionLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* weight = this->blobs_[0]->template cpu_data<Ftype>();
   for (int i = 0; i < bottom.size(); ++i) {
     const Ftype* bottom_data = bottom[i]->cpu_data<Ftype>();
@@ -42,6 +43,7 @@ void ConvolutionLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ConvolutionLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* weight = this->blobs_[0]->template cpu_data<Btype>();
   Btype* weight_diff = this->blobs_[0]->template mutable_cpu_diff<Btype>();
   for (int i = 0; i < top.size(); ++i) {

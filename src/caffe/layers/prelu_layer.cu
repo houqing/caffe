@@ -46,6 +46,7 @@ __global__ void PReLUParamBackward(const int n,
 template <typename Ftype, typename Btype>
 void PReLULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -62,6 +63,7 @@ void PReLULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   // NOLINT_NEXT_LINE(whitespace/operators)
   PReLUForward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
       count, channels, dim, bottom_data, top_data, slope_data, div_factor);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
 }
 
@@ -69,6 +71,7 @@ template <typename Ftype, typename Btype>
 void PReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* bottom_data = bottom[0]->gpu_data<Btype>();
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   const int count = bottom[0]->count();
@@ -95,6 +98,7 @@ void PReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       cdim, bottom[0]->num(), top[0]->offset(1), top_diff ,
       bottom_data ,
       backward_buff_.mutable_gpu_diff());
+MY_DP("CUDA-x");
     CUDA_POST_KERNEL_CHECK;
     if (channel_shared_) {
       Btype dsum;
@@ -117,6 +121,7 @@ void PReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
         CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
         count, channels, dim, top_diff, bottom_data, bottom_diff, slope_data,
         div_factor);
+MY_DP("CUDA-x");
     CUDA_POST_KERNEL_CHECK;
   }
 }

@@ -9,6 +9,7 @@ namespace caffe {
 template<typename Ftype, typename Btype>
 void
 BatchNormLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   int N = bottom[0]->shape(0);
   int C = channels_;
   int S = bottom[0]->count(0) / (N * C);
@@ -94,6 +95,7 @@ BatchNormLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom, const vec
 template<typename Ftype, typename Btype>
 void BatchNormLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   int N = bottom[0]->shape(0);
   int C = channels_;
   int S = bottom[0]->count(0) / (N * C);

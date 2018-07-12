@@ -141,6 +141,7 @@ TYPED_TEST(Im2colKernelTest, Test2D) {
         this->dilation_, this->dilation_,
         this->height_col_, this->width_col_,
         top_data + this->blob_top_->offset(n));
+MY_DP("CUDA-x");
       CUDA_POST_KERNEL_CHECK;
     }
 
@@ -198,6 +199,7 @@ TYPED_TEST(Im2colKernelTest, TestND) {
           this->blob_kernel_shape_->gpu_data(), this->blob_pad_->gpu_data(),
           this->blob_stride_->gpu_data(), this->blob_dilation_->gpu_data(),
           top_data_gpu + this->blob_top_->offset(n));
+MY_DP("CUDA-x");
       CUDA_POST_KERNEL_CHECK;
       CUDA_CHECK(cudaStreamSynchronize(stream));
     }

@@ -100,6 +100,7 @@ void DummyDataLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void DummyDataLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   for (int i = 0; i < top.size(); ++i) {
     const int filler_id = (fillers_.size() > 1) ? i : 0;
     if (refill_[filler_id]) {

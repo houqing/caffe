@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void ExpLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const int count = bottom[0]->count();
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
@@ -25,6 +26,7 @@ void ExpLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ExpLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) { return; }
   const int count = bottom[0]->count();
   const Btype* top_data = top[0]->gpu_data<Btype>();

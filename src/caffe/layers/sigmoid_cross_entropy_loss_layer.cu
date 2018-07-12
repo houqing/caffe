@@ -9,6 +9,7 @@ template <typename Ftype, typename Btype>
 void SigmoidCrossEntropyLossLayer<Ftype, Btype>::Backward_gpu(
     const vector<Blob*>& top, const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[1]) {
     LOG(FATAL) << this->type()
                << " Layer cannot backpropagate to label inputs.";

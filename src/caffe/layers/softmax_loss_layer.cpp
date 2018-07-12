@@ -94,6 +94,7 @@ float SoftmaxWithLossLayer<Ftype, Btype>::get_normalizer(
 template <typename Ftype, typename Btype>
 void SoftmaxWithLossLayer<Ftype, Btype>::Forward_cpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   // The forward pass computes the softmax prob values.
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Ftype* prob_data = prob_->template cpu_data<Ftype>();
@@ -123,6 +124,7 @@ void SoftmaxWithLossLayer<Ftype, Btype>::Forward_cpu(
 template <typename Ftype, typename Btype>
 void SoftmaxWithLossLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[1]) {
     LOG(FATAL) << this->type() << " Layer cannot backpropagate to label inputs.";
   }

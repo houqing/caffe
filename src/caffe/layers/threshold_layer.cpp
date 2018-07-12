@@ -14,6 +14,7 @@ void ThresholdLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void ThresholdLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   const int count = bottom[0]->count();

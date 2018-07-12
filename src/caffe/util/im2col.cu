@@ -58,6 +58,8 @@ void im2col_gpu(const Dtype* data_im, const int channels,
       num_kernels, data_im, height, width, kernel_h, kernel_w, pad_h,
       pad_w, stride_h, stride_w, dilation_h, dilation_w, height_col,
       width_col, data_col);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << num_kernels << " h=" << height << " w=" << width << " kh=" << kernel_h << " kw=" << kernel_w << " sh=" << stride_h << " sw=" << stride_w << " ph=" << pad_h << " pw=" << pad_w << " dilation_h=" << dilation_h << " dilation_w=" << dilation_w, "im2col16=" << num_kernels);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -235,6 +237,8 @@ void im2col_nd_gpu(const Dtype* data_im, const int num_spatial_axes,
     LOG(FATAL) << "im2col_nd_gpu does not support computation with "
                << num_spatial_axes << " spatial axes";
   }
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "im=" << *im_shape << " col=" << *col_shape << " k=" << *kernel_shape << " kn=" << num_kernels << " stride=" << *stride, "__TODO__");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -317,6 +321,8 @@ void col2im_gpu(const Dtype* data_col, const int channels,
       num_kernels, data_col, height, width, channels, kernel_h, kernel_w,
       pad_h, pad_w, stride_h, stride_w, dilation_h, dilation_w,
       height_col, width_col, data_im);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-x", "n=" << num_kernels << " h=" << height << " w=" << width << " c=" << channels << " kh=" << kernel_h << " kw=" << kernel_w << " sh=" << stride_h << " sw=" << stride_w << " ph=" << pad_h << " pw=" << pad_w << " dilation_h=" << dilation_h << " dilation_w=" << dilation_w, "col2im16=" << num_kernels);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -516,6 +522,8 @@ void col2im_nd_gpu(const Dtype* data_col, const int num_spatial_axes,
     LOG(FATAL) << "col2im_nd_gpu does not support computation with "
                << num_spatial_axes << " spatial axes";
   }
+//MY_DP("CUDA-x");
+MY_DP("CUDA:[" << "im=" << *im_shape << " col=" << *col_shape << " k=" << *kernel_shape << " stride=" << *stride << " (-pad)]");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

@@ -305,6 +305,7 @@ void DetectNetTransformationLayer<Dtype>::Forward_cpu(
     const vector<Blob*>& bottom,
     const vector<Blob*>& top
 ) {
+MY_DP("");
   // verify image parameters:
   const int image_count = bottom[0]->num();
   // verify label parameters:

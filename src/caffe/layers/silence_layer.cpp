@@ -7,6 +7,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void SilenceLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   for (int i = 0; i < bottom.size(); ++i) {
     if (propagate_down[i]) {
       bottom[i]->set_diff(0.F);

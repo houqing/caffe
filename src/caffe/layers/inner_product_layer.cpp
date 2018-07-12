@@ -82,6 +82,7 @@ InnerProductLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom, const vect
 template<typename Ftype, typename Btype>
 void InnerProductLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   const Ftype* weight = this->blobs_[0]->template cpu_data<Ftype>();
@@ -97,6 +98,7 @@ void InnerProductLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template<typename Ftype, typename Btype>
 void InnerProductLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (this->param_propagate_down_[0]) {
     const Btype* top_diff = top[0]->cpu_diff<Btype>();
     const Btype* bottom_data = bottom[0]->cpu_data<Btype>();

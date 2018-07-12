@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void Im2colLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int num_kernels = channels_ * top[0]->count(channel_axis_ + 1);
@@ -34,6 +35,7 @@ void Im2colLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void Im2colLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();
   for (int n = 0; n < num_; ++n) {

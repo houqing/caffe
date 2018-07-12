@@ -23,6 +23,7 @@ void TileLayer<Ftype, Btype>::Reshape(
 template <typename Ftype, typename Btype>
 void TileLayer<Ftype, Btype>::Forward_cpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   for (int i = 0; i < outer_dim_; ++i) {
@@ -37,6 +38,7 @@ void TileLayer<Ftype, Btype>::Forward_cpu(
 template <typename Ftype, typename Btype>
 void TileLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (!propagate_down[0]) { return; }
   const Btype* top_diff = top[0]->cpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_cpu_diff<Btype>();

@@ -44,6 +44,7 @@ void AccuracyLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom, const vec
 template <typename Ftype, typename Btype>
 void AccuracyLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   float accuracy = 0.F;
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   const Ftype* bottom_label = bottom[1]->cpu_data<Ftype>();

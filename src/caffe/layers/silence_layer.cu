@@ -8,12 +8,14 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void SilenceLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   // Do nothing.
 }
 
 template <typename Ftype, typename Btype>
 void SilenceLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   for (int i = 0; i < bottom.size(); ++i) {
     if (propagate_down[i]) {
       caffe_gpu_set<Btype>(bottom[i]->count(), Btype(0),

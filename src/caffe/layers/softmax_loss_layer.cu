@@ -54,6 +54,8 @@ template <typename Ftype, typename Btype>
 void SoftmaxWithLossLayer<Ftype, Btype>::Forward_gpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
+//MY_DP("");	// Special
+MY_DP("");
   const Ftype* prob_data = prob_->template gpu_data<Ftype>();
   const Ftype* label = bottom[1]->gpu_data<Ftype>();
   const int dim = prob_->count() / outer_num_;
@@ -73,11 +75,16 @@ void SoftmaxWithLossLayer<Ftype, Btype>::Forward_gpu(
         reinterpret_cast<const half*>(label), reinterpret_cast<half*>(loss_data),
         outer_num_, dim, inner_num_, has_ignore_label_, ignore_label_,
         reinterpret_cast<half*>(counts));
+//MY_DP("");	// Special
+MY_DPI("CUDA-SoftmaxLossForwardGPU", "n=" << nthreads, "log32=" << nthreads << " conv16to32=" << nthreads << " conv32to16=" << nthreads);
+
   } else {
     // NOLINT_NEXT_LINE(whitespace/operators)
     SoftmaxLossForwardGPU<<<CAFFE_GET_BLOCKS(nthreads),
         CAFFE_CUDA_NUM_THREADS, 0, stream>>> (nthreads, prob_data, label, loss_data,
         outer_num_, dim, inner_num_, has_ignore_label_, ignore_label_, counts);
+//MY_DP("");	// Special
+MY_DPI("CUDA-SoftmaxLossForwardGPU", "n=" << nthreads, "loss=-log(max(prob_data[n*dim+label_value*spatial_dim+s],min_dtype<Dtype>()))");
   }
   CUDA_CHECK(cudaStreamSynchronize(stream));
   float loss;
@@ -146,6 +153,7 @@ __global__ void SoftmaxLossBackwardGPU<half>(const int nthreads, const half* top
 template <typename Ftype, typename Btype>
 void SoftmaxWithLossLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[1]) {
     LOG(FATAL) << this->type()
                << " Layer cannot backpropagate to label inputs.";
@@ -165,6 +173,8 @@ void SoftmaxWithLossLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     SoftmaxLossBackwardGPU<<<CAFFE_GET_BLOCKS(nthreads),
         CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(nthreads, top_data, label, bottom_diff,
         outer_num_, dim, inner_num_, has_ignore_label_, ignore_label_, counts);
+//MY_DP("");	// Special
+MY_DPI("CUDA-SoftmaxLossBackwardGPU", "n=" << nthreads, "s32=" << nthreads << " conv16to32=" << nthreads << " conv32to16=" << nthreads);
     CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
     int valid_count = -1;
     // Only launch another CUDA kernel if we actually need the count of valid

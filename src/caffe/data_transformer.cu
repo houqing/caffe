@@ -270,6 +270,7 @@ void DataTransformer::TransformGPU(int N, int C, int H, int W,
         static_cast<int>(has_mean_values),
         mean, random_numbers, signed_data);
   }
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

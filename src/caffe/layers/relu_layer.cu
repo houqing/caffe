@@ -16,6 +16,7 @@ __global__ void ReLUForward(const int n, const Dtype* in, Dtype* out,
 template <typename Ftype, typename Btype>
 void ReLULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
 
@@ -24,6 +25,8 @@ void ReLULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   // NOLINT_NEXT_LINE(whitespace/operators)
   ReLUForward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
       count, bottom_data, top_data, negative_slope);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-ReLUForward", "n=" << count << " negative_slope=" << negative_slope, "comp16=" << count);
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
 }
@@ -41,6 +44,7 @@ template <typename Ftype, typename Btype>
 void ReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     const Btype* bottom_data = bottom[0]->gpu_data<Btype>();
     const Btype* top_diff = top[0]->gpu_diff<Btype>();
@@ -50,6 +54,8 @@ void ReLULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     // NOLINT_NEXT_LINE(whitespace/operators)
     ReLUBackward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
         count, top_diff, bottom_data, bottom_diff, negative_slope);
+//MY_DP("CUDA-x");
+MY_DPI("CUDA-ReLUBackward", "n=" << count << " negative_slope=" << negative_slope, "comp16=" << count);
     CUDA_POST_KERNEL_CHECK;
     CUDA_CHECK(cudaStreamSynchronize(Caffe::thread_stream()));
   }

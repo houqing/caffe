@@ -29,6 +29,7 @@ void DropoutLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void DropoutLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   unsigned int* mask = rand_vec_.mutable_cpu_data();
@@ -48,6 +49,7 @@ template <typename Ftype, typename Btype>
 void DropoutLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     const Btype* top_diff = top[0]->cpu_diff<Btype>();
     Btype* bottom_diff = bottom[0]->mutable_cpu_diff<Btype>();

@@ -10,6 +10,7 @@ const float kBNLL_THRESHOLD = 50.;
 template <typename Ftype, typename Btype>
 void BNLLLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -24,6 +25,7 @@ template <typename Ftype, typename Btype>
 void BNLLLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     const Btype* bottom_data = bottom[0]->cpu_data<Btype>();
     const Btype* top_diff = top[0]->cpu_diff<Btype>();

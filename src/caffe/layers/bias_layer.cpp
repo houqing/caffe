@@ -71,6 +71,7 @@ void BiasLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void BiasLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
       const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bias_data = ((bottom.size() > 1) ?
       bottom[1] : this->blobs_[0].get())->template cpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_cpu_data<Ftype>();
@@ -89,6 +90,7 @@ void BiasLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void BiasLayer<Ftype, Btype>::Backward_cpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0] && bottom[0] != top[0]) {
     const Btype* top_diff = top[0]->cpu_diff<Btype>();
     Btype* bottom_diff = bottom[0]->mutable_cpu_diff<Btype>();

@@ -63,6 +63,7 @@ void adam_reg_update_and_clear_gpu(int N,
       <<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(N,
       g, w, m, v,
       beta1, beta2, eps_hat, local_rate, local_decay, reg_type == "L2",  clear_grads);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -81,6 +82,7 @@ void adam_reg_update_and_clear_gpu<float16, float16>(int N,
       reinterpret_cast<half*>(g), reinterpret_cast<half*>(w),
       reinterpret_cast<half*>(m), reinterpret_cast<half*>(v),
       beta1, beta2, eps_hat, local_rate, local_decay, reg_type == "L2",  clear_grads);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

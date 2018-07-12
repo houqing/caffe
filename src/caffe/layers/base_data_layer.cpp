@@ -168,6 +168,7 @@ void BasePrefetchingDataLayer<Ftype, Btype>::InitializePrefetch() {
 template<typename Ftype, typename Btype>
 void BasePrefetchingDataLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   // Note: this function runs in one thread per object and one object per one Solver thread
   shared_ptr<Batch> batch = this->batch_transformer_->processed_pop();
   top[0]->Swap(*batch->data_);

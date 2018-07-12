@@ -156,6 +156,7 @@ void gpu_sumsq_t(const int n, const T* x, TR* sum, int group) {
         threadsPerCta * sizeof(TR) + sizeof(bool), stream>>>
             ((unsigned int)n, x, dev_ptr_sq, group);
   }
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaMemcpyAsync(sum, dev_ptr_sq, sizeof(TR), cudaMemcpyDeviceToHost, stream));
   CUDA_CHECK(cudaStreamSynchronize(stream));

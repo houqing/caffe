@@ -9,6 +9,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void ContrastiveLossLayer<Ftype, Btype>::Forward_gpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const int count = bottom[0]->count();
   caffe_gpu_sub<Ftype>(
       count,
@@ -81,6 +82,7 @@ __global__ void CLLBackward(const int count, const int channels,
 template <typename Ftype, typename Btype>
 void ContrastiveLossLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   cudaStream_t stream = Caffe::thread_stream();
   for (int i = 0; i < 2; ++i) {
     if (propagate_down[i]) {
@@ -99,6 +101,7 @@ void ContrastiveLossLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
           diff_.template gpu_data<Btype>(),  // the cached eltwise difference between a and b
           dist_sq_.template gpu_data<Btype>(),  // the cached square distance between a and b
           bottom[i]->mutable_gpu_diff<Btype>());
+MY_DP("CUDA-x");
       CUDA_POST_KERNEL_CHECK;
       CUDA_CHECK(cudaStreamSynchronize(stream));
     }

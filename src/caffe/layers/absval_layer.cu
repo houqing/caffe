@@ -7,6 +7,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void AbsValLayer<Ftype, Btype>::Forward_gpu(
     const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const int count = top[0]->count();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   caffe_gpu_abs(count, bottom[0]->gpu_data<Ftype>(), top_data);
@@ -15,6 +16,7 @@ void AbsValLayer<Ftype, Btype>::Forward_gpu(
 template <typename Ftype, typename Btype>
 void AbsValLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const int count = top[0]->count();
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   if (propagate_down[0]) {

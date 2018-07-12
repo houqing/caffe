@@ -17,6 +17,7 @@ __global__ void ELUForward(const int n, const Dtype* in, Dtype* out,
 template <typename Ftype, typename Btype>
 void ELULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -25,6 +26,7 @@ void ELULayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   // NOLINT_NEXT_LINE(whitespace/operators)
   ELUForward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
       count, bottom_data, top_data, alpha, lambda);
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
 }
 
@@ -42,6 +44,7 @@ template <typename Ftype, typename Btype>
 void ELULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     const Btype* bottom_data = bottom[0]->gpu_data<Btype>();
     const Btype* top_diff = top[0]->gpu_diff<Btype>();
@@ -53,6 +56,7 @@ void ELULayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     // NOLINT_NEXT_LINE(whitespace/operators)
     ELUBackward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, Caffe::thread_stream()>>>(
         count, top_diff, top_data, bottom_data, bottom_diff, alpha, lambda);
+MY_DP("CUDA-x");
     CUDA_POST_KERNEL_CHECK;
   }
 }

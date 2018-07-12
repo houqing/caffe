@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void CuDNNLRNLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   CUDNN_CHECK(cudnnLRNCrossChannelForward(Caffe::cudnn_handle(0),
       norm_desc_,
       CUDNN_LRN_CROSS_CHANNEL_DIM1,
@@ -21,6 +22,7 @@ void CuDNNLRNLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CuDNNLRNLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   CUDNN_CHECK(cudnnLRNCrossChannelBackward(Caffe::cudnn_handle(0),
       norm_desc_,
       CUDNN_LRN_CROSS_CHANNEL_DIM1,

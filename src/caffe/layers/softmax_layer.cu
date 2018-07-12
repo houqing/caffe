@@ -82,6 +82,7 @@ __global__ void kernel_channel_dot(const int num, const int channels,
 template <typename Ftype, typename Btype>
 void SoftmaxLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   Ftype* scale_data = scale_.template mutable_gpu_data<Ftype>();
@@ -96,31 +97,37 @@ void SoftmaxLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   kernel_channel_max<<<CAFFE_GET_BLOCKS(outer_num_ * inner_num_),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(outer_num_, channels, inner_num_, top_data,
       scale_data);
+MY_DPI("CUDA-kernel_channel_max", "n=" << outer_num_ * inner_num_ << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "comp16=" << outer_num_ * inner_num_ * channels);
   // subtract
   // NOLINT_NEXT_LINE(whitespace/operators)
   kernel_channel_subtract<<<CAFFE_GET_BLOCKS(count),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(count, outer_num_, channels, inner_num_,
       scale_data, top_data);
+MY_DPI("CUDA-kernel_channel_subtract", "n=" << count << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "a16=" << count);
   // exponentiate
   // NOLINT_NEXT_LINE(whitespace/operators)
   kernel_exp<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(
       count, top_data, top_data);
+MY_DPI("CUDA-kernel_channel_exp", "n=" << count, "exp16=" << count);
   // sum after exp
   // NOLINT_NEXT_LINE(whitespace/operators)
   kernel_channel_sum<<<CAFFE_GET_BLOCKS(outer_num_ * inner_num_),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(outer_num_, channels, inner_num_, top_data,
       scale_data);
+MY_DPI("CUDA-kernel_channel_sum", "n=" << outer_num_ * inner_num_ << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "a16=" << outer_num_ * inner_num_ * channels);
   // divide
   // NOLINT_NEXT_LINE(whitespace/operators)
   kernel_channel_div<<<CAFFE_GET_BLOCKS(count),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(count, outer_num_, channels, inner_num_,
       scale_data, top_data);
+MY_DPI("CUDA-kernel_channel_div", "n=" << count << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "m16=" << count);
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
 
 template <typename Ftype, typename Btype>
 void SoftmaxLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   const Btype* top_data = top[0]->gpu_data<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();
@@ -134,10 +141,12 @@ void SoftmaxLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
   kernel_channel_dot<<<CAFFE_GET_BLOCKS(outer_num_ * inner_num_),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(outer_num_, channels, inner_num_,
       top_diff, top_data, scale_data);
+MY_DPI("CUDA-kernel_channel_dot", "n=" << outer_num_ * inner_num_ << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "");
   // NOLINT_NEXT_LINE(whitespace/operators)
   kernel_channel_subtract<<<CAFFE_GET_BLOCKS(count),
       CAFFE_CUDA_NUM_THREADS, 0, stream>>>(count, outer_num_, channels, inner_num_,
       scale_data, bottom_diff);
+MY_DPI("CUDA-kernel_channel_subtract", "n=" << count << " num=" << outer_num_ << " channels=" << channels << " spatial_dim=" << inner_num_, "");
   CUDA_CHECK(cudaStreamSynchronize(stream));
   // elementwise multiplication
   caffe_gpu_mul(top[0]->count(), bottom_diff, top_data, bottom_diff);

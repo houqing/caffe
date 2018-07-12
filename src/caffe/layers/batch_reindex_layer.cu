@@ -21,6 +21,7 @@ __global__ void BRForward(const int count, const int inner_dim, const Dtype* in,
 template <typename Ftype, typename Btype>
 void BatchReindexLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
                                            const vector<Blob*>& top) {
+MY_DP("");
   check_batch_reindex(bottom[0]->shape(0), bottom[1]->count(),
                       bottom[1]->cpu_data<Ftype>());
   if (top[0]->count() == 0) {
@@ -33,6 +34,7 @@ void BatchReindexLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
       top[0]->count(), bottom[0]->count() / bottom[0]->shape(0),
       bottom[0]->gpu_data<Ftype>(), bottom[1]->gpu_data<Ftype>(),
       top[0]->mutable_gpu_data<Ftype>());
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }
@@ -59,6 +61,7 @@ template <typename Ftype, typename Btype>
 void BatchReindexLayer<Ftype, Btype>::Backward_gpu(
     const vector<Blob*>& top, const vector<bool>& propagate_down,
     const vector<Blob*>& bottom) {
+MY_DP("");
   CHECK(!propagate_down[1]) << "Cannot backprop to index.";
   if (!propagate_down[0]) {
     return;
@@ -104,6 +107,7 @@ void BatchReindexLayer<Ftype, Btype>::Backward_gpu(
       bottom[0]->count(), bottom[0]->count() / bottom[0]->shape(0),
       top[0]->gpu_diff<Btype>(), top_indexes.gpu_data(), begins.gpu_data(),
       counts.gpu_data(), bottom[0]->mutable_gpu_diff<Btype>());
+MY_DP("CUDA-x");
   CUDA_POST_KERNEL_CHECK;
   CUDA_CHECK(cudaStreamSynchronize(stream));
 }

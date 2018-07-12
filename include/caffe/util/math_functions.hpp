@@ -348,6 +348,7 @@ void caffe_gpu_##name<float16>(const int n, const float16* x, float16* y) { \
   cudaStream_t stream = Caffe::thread_stream(); \
   /* NOLINT_NEXT_LINE(whitespace/operators) */ \
   name##_kernel<float16><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(n, x, y); \
+MY_DPI("CUDA-x", "TODO-fp16", ""); \
   CUDA_CHECK(cudaStreamSynchronize(stream)); \
 }
 
@@ -367,6 +368,7 @@ void caffe_gpu_##name<float>(const int n, const float* x, float* y, void* handle
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream)); \
   /* NOLINT_NEXT_LINE(whitespace/operators) */ \
   name##_kernel<float><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(n, x, y); \
+MY_DPI("CUDA-x", "TODO-fp32", ""); \
   CUDA_CHECK(cudaStreamSynchronize(stream)); \
 } \
 template <> \
@@ -384,6 +386,7 @@ void caffe_gpu_##name<float16>(const int n, const float16* x, float16* y, void* 
   cublasHandle_t cublas_handle = \
       handle == nullptr ? Caffe::cublas_handle() : reinterpret_cast<cublasHandle_t>(handle); \
   cudaStream_t stream; \
+MY_DPI("CUBLAS-x", "TODO-fp16"); \
   CUBLAS_CHECK(cublasGetStream(cublas_handle, &stream)); \
   /* NOLINT_NEXT_LINE(whitespace/operators) */ \
   name##_kernel<float16><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS, 0, stream>>>(n, x, y); \

@@ -7,6 +7,7 @@ namespace caffe {
 template<typename Ftype, typename Btype>
 void BasePrefetchingDataLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   // Note: this function runs in one thread per object and one object per one Solver thread
   shared_ptr<Batch> batch = this->batch_transformer_->processed_pop();
   if (batch_size_ == 1 || (last_shape_.size() > 0 && top[0]->shape() != last_shape_)) {

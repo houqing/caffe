@@ -22,6 +22,7 @@ DropoutForward(const int n, const Dtype* in, const unsigned int* mask, const uns
 template<typename Ftype, typename Btype>
 void
 DropoutLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom, const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   const int count = bottom[0]->count();
@@ -33,6 +34,7 @@ DropoutLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom, const vecto
     // NOLINT_NEXT_LINE(whitespace/operators)
     DropoutForward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>
         (count, bottom_data, mask, uint_thres_, scale_, top_data);
+MY_DP("CUDA-x");
     CUDA_POST_KERNEL_CHECK;
     CUDA_CHECK(cudaStreamSynchronize(stream));
   } else {
@@ -55,6 +57,7 @@ __global__ void DropoutBackward(const int n, const Dtype* in_diff, const unsigne
 template<typename Ftype, typename Btype>
 void DropoutLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   const Btype* top_diff = top[0]->gpu_diff<Btype>();
   Btype* bottom_diff = bottom[0]->mutable_gpu_diff<Btype>();
 
@@ -66,6 +69,7 @@ void DropoutLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
       // NOLINT_NEXT_LINE(whitespace/operators)
       DropoutBackward<<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS, 0, stream>>>
           (count, top_diff, mask, uint_thres_, scale_, bottom_diff);
+MY_DP("CUDA-x");
       CUDA_POST_KERNEL_CHECK;
       CUDA_CHECK(cudaStreamSynchronize(stream));
     } else {

@@ -8,6 +8,7 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void CuDNNSoftmaxLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+MY_DP("");
   const Ftype* bottom_data = bottom[0]->gpu_data<Ftype>();
   Ftype* top_data = top[0]->mutable_gpu_data<Ftype>();
   CUDNN_CHECK(cudnnSoftmaxForward(Caffe::cudnn_handle(0), CUDNN_SOFTMAX_ACCURATE,
@@ -22,6 +23,7 @@ void CuDNNSoftmaxLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
 template <typename Ftype, typename Btype>
 void CuDNNSoftmaxLayer<Ftype, Btype>::Backward_gpu(const vector<Blob*>& top,
     const vector<bool>& propagate_down, const vector<Blob*>& bottom) {
+MY_DP("");
   if (propagate_down[0]) {
     const Btype* top_data = top[0]->gpu_data<Btype>();
     const Btype* top_diff = top[0]->gpu_diff<Btype>();
